@@ -23,16 +23,16 @@ func gitlabTest() {
 func githubTest() {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: "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"},
+		&oauth2.Token{AccessToken: "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"},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
 
 	// list all repositories for the authenticated user
-	result, _, err := client.Search.Code(context.Background(), "star:>100", &github.SearchOptions{Sort: "stars", Order: "desc", ListOptions: github.ListOptions{Page: 1, PerPage: 2}})
+	result, _, err := client.Search.Code(context.Background(), "dummyMarkdown in:file", &github.SearchOptions{Sort: "stars", Order: "desc", ListOptions: github.ListOptions{Page: 1, PerPage: 2}})
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		panic(err)
 	}
 	r, err := json.Marshal(result)
 	fmt.Println(string(r))
