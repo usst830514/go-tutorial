@@ -1,45 +1,79 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
+	"bytes"
 	"fmt"
-	"github.com/google/go-github/v35/github"
-	"github.com/xanzy/go-gitlab"
-	"golang.org/x/oauth2"
-	"log"
+	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/viper"
 )
 
-func gitlabTest() {
-	client, err := gitlab.NewClient("_wL5Zkipsb9JxEW3LpVX", gitlab.WithBaseURL("http://gitlab.hupu.com/api/v3"))
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+func readingConfigFiles() {
+	viper.SetConfigName("config") // name of config file (without extension)
+	viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
+	//viper.AddConfigPath("/etc/appname/")  // path to look for the config file in
+	//viper.AddConfigPath("$HOME/.appname") // call multiple times to add many search paths
+	viper.AddConfigPath(".") // optionally look for config in the working directory
+	if err := viper.ReadInConfig(); err != nil {
+		panic(fmt.Errorf("Fatal error read config file: %w \n", err))
 	}
-	listProjectsOptions := &gitlab.ListProjectsOptions{}
-	projects, _, err := client.Projects.ListProjects(listProjectsOptions)
-	p, _ := json.Marshal(projects)
-	fmt.Println(string(p))
 }
 
-func githubTest() {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: "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"},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+func watching() {
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		fmt.Println("Config file changed:", e.Name)
+	})
+}
 
-	client := github.NewClient(tc)
-
-	searchOptions := &github.SearchOptions{Sort: "stars", Order: "desc", ListOptions: github.ListOptions{Page: 1, PerPage: 1}}
-	result, _, err := client.Search.Code(context.Background(), "test in:file", searchOptions)
-	if err != nil {
-		panic(err)
+func writingConfigFiles() {
+	if err := viper.SafeWriteConfigAs("/tmp/config.yaml"); err != nil {
+		panic(fmt.Errorf("Fatal error write config file: %w \n", err))
 	}
-	r, err := json.Marshal(result)
-	fmt.Println(string(r))
+}
+
+func readingConfigFromIOReader() {
+	viper.SetConfigType("yaml") // or viper.SetConfigType("YAML")
+
+	// any approach to require this configuration into your program.
+	var yamlExample = []byte(`
+Hacker: true
+name: steve
+hobbies:
+- skateboarding
+- snowboarding
+- go
+clothing:
+  jacket: leather
+  trousers: denim
+age: 35
+eyes : brown
+beard: true
+`)
+
+	if err := viper.ReadConfig(bytes.NewBuffer(yamlExample)); err != nil {
+		panic(fmt.Errorf("Fatal error read config file: %w \n", err))
+	}
+
+	fmt.Println(viper.Get("hobbies")) // this would be "steve"
+}
+
+func registerAlias() {
+	viper.RegisterAlias("loud", "Verbose")
+
+	viper.Set("verbose", true) // same result as next line
+	viper.Set("loud", true)    // same result as prior line
+
+	viper.GetBool("loud")    // true
+	viper.GetBool("verbose") // true
 }
 
 func main() {
-	gitlabTest()
-	//githubTest()
+	//readingConfigFiles()
+
+	//watching()
+
+	//writingConfigFiles()
+
+	readingConfigFromIOReader()
+
 }
