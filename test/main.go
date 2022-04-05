@@ -269,5 +269,5 @@ func main() {
 		}
 	}()
 
-	time.Sleep(3600 * time.Second) //睡眠，保持程序不退出
+	time.Sleep(36000 * time.Second) //睡眠，保持程序不退出
 }
