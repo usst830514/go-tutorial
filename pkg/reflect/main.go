@@ -165,7 +165,7 @@ func FieldByIndex() {
 	//fmt.Println("embedded last name:", s)
 }
 
-func test() {
+func switchCase() {
 	//i := new(v1beta1.HTTPIngressPath)
 	i := [3]int32{}
 	v := reflect.ValueOf(i)
@@ -190,6 +190,24 @@ func test() {
 	}
 }
 
+func interfaceToReflectObj() {
+	author := "draven"
+	fmt.Println("TypeOf author:", reflect.TypeOf(author))
+	fmt.Println("ValueOf author:", reflect.ValueOf(author))
+}
+
+func reflectObjToInterface() {
+	v := reflect.ValueOf(1)
+	fmt.Println(v.Interface().(int))
+}
+
+func reflectObjSet() {
+	i := 1
+	v := reflect.ValueOf(&i)
+	v.Elem().SetInt(10)
+	fmt.Println(i)
+}
+
 func main() {
 	//Kind()
 	//MakeFunc()
@@ -198,5 +216,7 @@ func main() {
 	//StructTagLookup()
 	//TypeOf()
 	//FieldByIndex()
-	test()
+	//switchCase()
+	//interfaceToReflectObj()
+	reflectObjToInterface()
 }
