@@ -3,11 +3,12 @@ package main
 import "fmt"
 
 func getGun(gunType string) (iGun, error) {
-	if gunType == "ak47" {
+	switch gunType {
+	case "ak47":
 		return newAk47(), nil
-	}
-	if gunType == "musket" {
+	case "musket":
 		return newMusket(), nil
+	default:
+		return nil, fmt.Errorf("wrong gun type passed")
 	}
-	return nil, fmt.Errorf("Wrong gun type passed")
 }

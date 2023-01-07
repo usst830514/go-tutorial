@@ -8,13 +8,12 @@ type iSportsFactory interface {
 }
 
 func getSportsFactory(brand string) (iSportsFactory, error) {
-	if brand == "adidas" {
-		return &adidas{}, nil
+	switch brand {
+	case "adidas":
+		return new(adidas), nil
+	case "nike":
+		return new(nike), nil
+	default:
+		return nil, fmt.Errorf("wrong brand type passed")
 	}
-
-	if brand == "nike" {
-		return &nike{}, nil
-	}
-
-	return nil, fmt.Errorf("Wrong brand type passed")
 }
